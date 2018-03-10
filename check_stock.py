@@ -55,6 +55,7 @@ def main():
         if 'www.walmart.com' in url:
             title = soup.find('h1', 'prod-ProductTitle no-margin heading-a').find('div').get_text()
             button = soup.find('button', class_='prod-ProductCTA--server btn btn-primary btn-block')
+            product = 'walmart_' + soup.find('div', class_='valign-middle s-margin-left copy-mini display-inline-block wm-item-number').get_text().split(':')[1].strip()
         if 'www.target.com' in url:
             title = soup.find('span', attrs={'data-test':'product-title'}).get_text()
             button = soup.find('button', attrs={'data-test':'addToCartBtn'}) #find attribute
