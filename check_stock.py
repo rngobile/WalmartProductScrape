@@ -76,7 +76,12 @@ def main():
                     sendText(environment, config, title, url)
                     print "Product Available!"
 
-                    with open('alerted.list', 'a') as alertFile:
+                    if os.path.exist('alerted.list'):
+                        append_write = 'a'
+                    else:
+                        append_write = 'w'
+
+                    with open('alerted.list', append_write) as alertFile:
                         alertFile.write(product + "\n")
                     alertFile.close()
                 else:
