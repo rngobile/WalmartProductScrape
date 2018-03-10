@@ -37,6 +37,12 @@ def main():
     config.read('../config.ini')
     urls = config.get(environment,'urls').split(',')
 
+    # items that alread has been alerted
+    with open('alerted.list', 'r') as alertFile:
+        alerted = alertFile.readlines()
+    alertFile.close()
+    alerted = [x.strip() for x in alerted]
+
     for url in urls:
         try:
             page = requests.get(url)
@@ -52,16 +58,27 @@ def main():
         if 'www.target.com' in url:
             title = soup.find('span', attrs={'data-test':'product-title'}).get_text()
             button = soup.find('button', attrs={'data-test':'addToCartBtn'}) #find attribute
+            details = soup.find('div', attrs={'data-test':'detailsTab'}).find_all('div')
+            for detail in details:
+                if 'Item Number (DPCI)' in detail.get_text():
+                    product = "target_" + str(detail.get_text().split(':')[1]).strip()
 
         print title
         print url
 
         if(button):
-            print "Product Available!"
-            if button.get_text().lower() == 'add to cart':
-                sendText(environment, config, title, url)
+            if product not in alerted:
+                if button.get_text().lower() == 'add to cart':
+                    #sendText(environment, config, title, url)
+                    print "Product Available!"
+
+                    with open('alerted.list', 'a') as alertFile:
+                        alertFile.write(product + "\n")
+                    alertFile.close()
+                else:
+                    print button.get_text()
             else:
-                print button.get_text()
+                print "Already Alerted! " + product
         else:
             print "Doesn't seem to be in stock."
         page.connection.close()
