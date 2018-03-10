@@ -41,9 +41,8 @@ def main():
         print "Product Exist!"
         #os.system('play --no-show-progress --null --channels 1 synth %s sine %f' % (duration, freq))
         client.api.account.messages.create(
-            to="To Number",
-            from_="From number on Twilio",
-            #from_="+15005550006", //Test account number
+            to=to_number,
+            from_=from_number,
             body=title)
         print button.get_text()
     else:
