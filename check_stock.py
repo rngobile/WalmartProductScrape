@@ -10,7 +10,7 @@ def main():
     environment = 'TRIAL'
     # Get variables from config file
     config = ConfigParser.ConfigParser()
-    config.read('config.ini')
+    config.read('../config.ini')
 
     # variables for message beeps
     duration = 0.5  # second
@@ -20,7 +20,7 @@ def main():
     account_sid = config.get(environment,'account_sid')
     auth_token = config.get(environment,'auth_token')
     to_number = config.get(environment,'to_number')
-    from_twil = config.get(environment,'from_twil')
+    from_number = config.get(environment,'from_number')
     client = Client(account_sid, auth_token)
 
     url = sys.argv[1]
