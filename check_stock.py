@@ -7,7 +7,7 @@ from twilio.rest import Client
 import ConfigParser
 
 def main():
-    environment = 'TRIAL'
+    environment = sys.argv[1]
     # Get variables from config file
     config = ConfigParser.ConfigParser()
     config.read('../config.ini')
@@ -23,30 +23,33 @@ def main():
     from_number = config.get(environment,'from_number')
     client = Client(account_sid, auth_token)
 
-    url = sys.argv[1]
+    urls = config.get(environment,'urls').split(',')
     #url = "https://www.walmart.com/ip/Funko-POP-Marvel-Stan-Lee-with-Futuristic-Glasses/197736146"
     #url = "https://www.walmart.com/ip/Funko-POP-Marvel-Black-Panther-POP-8-Walmart-Exclusive/446357810"
-    page = requests.get(url)
+    for url in urls:
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, 'html.parser')
 
-    print "Status: " + str(page.status_code)
-    soup = BeautifulSoup(page.content, 'html.parser')
-    #print(soup.prettify())
-    #stock = soup.find('span', class_='copy-mini')
-    #print(stock.get_text())
-    title = soup.find('h1', 'prod-ProductTitle no-margin heading-a').find('div').get_text()
-    button = soup.find('button', class_='prod-ProductCTA--server btn btn-primary btn-block')
-    print title
+        if 'www.walmart.com' in url:
+            title = soup.find('h1', 'prod-ProductTitle no-margin heading-a').find('div').get_text()
+            button = soup.find('button', class_='prod-ProductCTA--server btn btn-primary btn-block')
 
-    if(button):
-        print "Product Exist!"
-        #os.system('play --no-show-progress --null --channels 1 synth %s sine %f' % (duration, freq))
-        client.api.account.messages.create(
-            to=to_number,
-            from_=from_number,
-            body=title)
-        print button.get_text()
-    else:
-        print "Product does not exists!"
+        print "Status: " + str(page.status_code)
+        print title
+
+        if(button):
+            print "Product Available!"
+            #os.system('play --no-show-progress --null --channels 1 synth %s sine %f' % (duration, freq))
+            if button.get_text() == 'Add to Cart':
+                client.api.account.messages.create(
+                    to=to_number,
+                    from_=from_number,
+                    body="Product Available!\n" + title + '\n' + url)
+            else:
+                print button.get_text()
+        else:
+            print "Doesn't seem to be in stock."
+        page.connection.close()
 
     #print soup.prettify()
 
