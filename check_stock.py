@@ -34,14 +34,17 @@ def main():
 
     # Get variables from config file
     config = ConfigParser.ConfigParser()
-    config.read('../config.ini')
+    config.read('/home/ubuntu/project/config.ini')
     urls = config.get(environment,'urls').split(',')
 
     # items that alread has been alerted
-    with open('alerted.list', 'r') as alertFile:
-        alerted = alertFile.readlines()
-    alertFile.close()
-    alerted = [x.strip() for x in alerted]
+    try:
+        with open('alerted.list', 'r') as alertFile:
+            alerted = alertFile.readlines()
+        alertFile.close()
+        alerted = [x.strip() for x in alerted]
+    except:
+        print "alerted.list not found, will continue."
 
     for url in urls:
         try:
@@ -70,7 +73,7 @@ def main():
         if(button):
             if product not in alerted:
                 if button.get_text().lower() == 'add to cart':
-                    #sendText(environment, config, title, url)
+                    sendText(environment, config, title, url)
                     print "Product Available!"
 
                     with open('alerted.list', 'a') as alertFile:
